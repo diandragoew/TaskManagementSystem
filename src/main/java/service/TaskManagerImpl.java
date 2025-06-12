@@ -1,58 +1,96 @@
 package service;
 
-import model.Status;
-import model.Task;
+import model.task.*; // Ensure all necessary Task-related imports are here
 import util.FileHandler;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class TaskManagerImpl implements TaskManager {
 
-    private  Set<Task> tasks = new TreeSet<>();
+    private Set<Task> tasks = new TreeSet<>();
 
-   public  void loadAllTasks(){
-        tasks = FileHandler.readTasksFromFile();
+    public TaskManagerImpl() {
+        // Initialize tasks by loading from file
+        loadAllTasks();
     }
-    @Override
-    public  void createTasks(Set<Task> tasks) {
 
-        if (!tasks.isEmpty()) {
-            for (Task task : tasks) {
-                //if isAdded is true, it means that the task is added in the collection and it will be written to the file as well
-                boolean isAdded = tasks.add(task);
-                if (isAdded) {
-                    FileHandler.writeTasksToFile(task, true);
-                }
-            }
-        } else {
-            System.out.println("No tasks added.");
-        }
+    public void loadAllTasks() {
+        this.tasks = FileHandler.readTasksFromFile();
     }
 
     @Override
     public void displayAllTasks() {
-
-
-        // --- Example of reading tasks ---
-        Set<Task> loadedTasks = FileHandler.readTasksFromFile();
-        displayGivenTasks(loadedTasks);
+        displayGivenTasks(tasks);
     }
 
-    void displayGivenTasks(Set<Task> tasks) {
-        System.out.println("\nLoaded Tasks:");
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks loaded or file is empty.");
+    // GENERATE NEXT TASK ID
+    private long generateNextTaskId() {
+        // Find the maximum existing ID
+        Optional<Long> maxIdOptional = tasks.stream()
+                .map(task -> (long) task.getId())
+                .max(Long::compare);
+
+        long nextId;
+        if (maxIdOptional.isPresent()) {
+            long currentMaxId = maxIdOptional.get();
+            // Check for potential overflow before incrementing
+            if (currentMaxId >= Long.MAX_VALUE) {
+                throw new IllegalStateException("Cannot generate new task ID: Maximum ID limit reached.");
+            }
+            nextId = currentMaxId + 1;
         } else {
-            for (Task task : tasks) {
+            nextId = 1; // Start with 1 if no tasks exist
+        }
+        return nextId;
+    }
+
+    @Override
+    public Task createTask(String title, String description, LocalDate dueDate, Priority priority, Status status, Category category, LocalDate creationDate) {
+        long newTaskId = generateNextTaskId(); // Generate the ID here
+
+        Task task = TaskCreator.createTask(
+                newTaskId,
+                title,
+                description,
+                dueDate,
+                priority,
+                status,
+                category,
+                creationDate
+        );
+
+        // Add the new task to the in-memory set
+        boolean isAdded = tasks.add(task);
+
+        if (isAdded) {
+            //Write ALL tasks back to the file, overwriting old content
+            FileHandler.writeTasksToFile(tasks); // Call the method that writes the whole Set
+            System.out.println("Task created: " + task.getTitle() + " (ID: " + task.getId() + ") and saved to file.");
+        } else {
+            System.out.println("Task with Title " + task.getTitle() + " already exists or could not be added.");
+            return null; // Task was not added
+        }
+        return task;
+    }
+
+    public void displayGivenTasks(Set<Task> tasksToDisplay) { // Renamed parameter for clarity
+        System.out.println("\n--- Displaying Tasks ---");
+        if (tasksToDisplay.isEmpty()) {
+            System.out.println("No tasks to display.");
+        } else {
+            for (Task task : tasksToDisplay) {
                 System.out.println("--- Task ID: " + task.getId() + " ---");
                 System.out.println("Title: " + task.getTitle());
                 System.out.println("Description: " + task.getDescription());
                 System.out.println("Due Date: " + task.getDueDate());
                 System.out.println("Priority: " + task.getPriority());
                 System.out.println("Status: " + task.getStatus());
+                System.out.println("Category: " + task.getCategory());
                 System.out.println("Creation Date: " + task.getCreationDate());
                 System.out.println();
             }
@@ -61,32 +99,68 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public Set<Task> searchTask(String title, String description) {
-        Set<Task> findedTasks = tasks.stream().filter(task -> task.getTitle().contains(title) || task.getDescription().contains(description)).collect(Collectors.toSet());
-        return findedTasks;
+        final String searchTitle = (title != null) ? title : "";
+        final String searchDescription = (description != null) ? description : "";
+
+        Set<Task> foundTasks = tasks.stream()
+                .filter(task -> (task.getTitle() != null && task.getTitle().toLowerCase().contains(searchTitle.toLowerCase())) &&
+                        (task.getDescription() != null && task.getDescription().toLowerCase().contains(searchDescription.toLowerCase()))
+                )
+                .collect(Collectors.toSet());
+
+        return foundTasks;
     }
 
     @Override
-    public void completeTasks(Set<Task> completedTasks) {
-        if (!completedTasks.isEmpty()) {
-            for (Task completedtask : completedTasks) {
-                tasks.stream().filter(task -> task.getId() == completedtask.getId()).findFirst().ifPresent(task -> task.setStatus(Status.COMPLETED));
+    public void completeTask(Long taskIdToComplete) {
+        if (taskIdToComplete == null) {
+            System.out.println("Task ID to complete cannot be null.");
+            return;
+        }
+
+        boolean taskFoundAndUpdated = false;
+        // Iterate and find the task in the 'tasks' Set
+        for (Task existingTask : tasks) {
+            if (existingTask.getId() == taskIdToComplete) {
+                existingTask.setStatus(Status.COMPLETED); // Modify the existing object
+                taskFoundAndUpdated = true;
+                break; // Found and updated, exit loop
             }
-            for (Task task : tasks) {
-                FileHandler.writeTasksToFile(task, false);
-            }
+        }
+
+        if (taskFoundAndUpdated) {
+            // Write ALL tasks back to the file after modification
+            FileHandler.writeTasksToFile(tasks);
+            System.out.println("Task ID " + taskIdToComplete + " marked as COMPLETED and file saved.");
+        } else {
+            System.out.println("Task ID " + taskIdToComplete + " not found.");
         }
     }
 
     @Override
-    public void deleteTasks(List<Task> deletedTasks) {
-        if (!deletedTasks.isEmpty()) {
-            for (Task deletedtask : deletedTasks) {
-                tasks.removeIf(task -> task.getId() == deletedtask.getId());
-            }
-            for (Task task : tasks) {
-                FileHandler.writeTasksToFile(task, false);
-            }
+    public void deleteTask(Long taskIdToDelete) {
+        if (taskIdToDelete == null) {
+            System.out.println("Task ID to delete cannot be null.");
+            return;
+        }
+
+        boolean removed = tasks.removeIf(task -> task.getId() == taskIdToDelete);
+
+        if (removed) {
+            // Write ALL tasks back to the file after modification
+            FileHandler.writeTasksToFile(tasks);
+            System.out.println("Task ID " + taskIdToDelete + " deleted and file saved.");
+        } else {
+            System.out.println("Task ID " + taskIdToDelete + " not found.");
         }
     }
 
+    @Override
+    public Task getTaskById(Long id) {
+        if (id == null) return null;
+        return tasks.stream()
+                .filter(task -> task.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
 }

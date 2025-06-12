@@ -1,4 +1,4 @@
-package model;
+package model.task;
 
 public enum Priority {
     HIGH("HIGH"),
@@ -7,8 +7,6 @@ public enum Priority {
 
     private final String priorityName;
 
-    // The enum constructor
-    // It must be private or package-private
     Priority(String priorityName) {
         this.priorityName = priorityName;
     }

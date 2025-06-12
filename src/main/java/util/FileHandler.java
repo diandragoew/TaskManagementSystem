@@ -1,9 +1,6 @@
 package util;
 
-
-import model.Priority;
-import model.Status;
-import model.Task;
+import model.task.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,15 +23,14 @@ public class FileHandler {
 
     private static final String TASKS_FILE_PATH = "src/main/resources/tasks";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static Set<Task> tasks = new TreeSet<>();
-
 
     public static Set<Task> readTasksFromFile() {
+        Set<Task> tasks = new TreeSet<>(); // Initialize a new Set for each read operation
         Path filePath = Paths.get(TASKS_FILE_PATH);
 
         if (!Files.exists(filePath)) {
             System.out.println("Tasks file not found at: " + TASKS_FILE_PATH);
-            return tasks; // Return empty Set if file doesn't exist
+            return tasks;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
@@ -42,7 +38,6 @@ public class FileHandler {
             StringBuilder currentTaskBlock = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 if (line.trim().startsWith("task") && currentTaskBlock.length() > 0) {
-                    // New task block found, parse the previous one
                     Task task = parseTaskBlock(currentTaskBlock.toString());
                     if (task != null) {
                         tasks.add(task);
@@ -51,7 +46,6 @@ public class FileHandler {
                 }
                 currentTaskBlock.append(line).append("\n"); // Append line to current block
             }
-            // Parse the last task block after the loop ends
             if (currentTaskBlock.length() > 0) {
                 Task task = parseTaskBlock(currentTaskBlock.toString());
                 if (task != null) {
@@ -71,15 +65,16 @@ public class FileHandler {
         LocalDate dueDate = null;
         Priority priority = null;
         Status status = null;
+        Category category = null;
         LocalDate creationDate = null;
 
-        // Using regex patterns to extract information
         Pattern idPattern = Pattern.compile("ID:(\\d+)");
         Pattern titlePattern = Pattern.compile("Title:(.*)");
         Pattern descPattern = Pattern.compile("Description:(.*)");
         Pattern dueDatePattern = Pattern.compile("Due Date:(\\d{4}-\\d{2}-\\d{2})");
         Pattern priorityPattern = Pattern.compile("Priority:(\\w+)");
         Pattern statusPattern = Pattern.compile("Status:(\\w+)");
+        Pattern categoryPattern = Pattern.compile("Category:(\\w+)");
         Pattern creationDatePattern = Pattern.compile("Creation Date:(\\d{4}-\\d{2}-\\d{2})");
 
         Matcher matcher;
@@ -122,15 +117,23 @@ public class FileHandler {
             }
         }
 
+        matcher = categoryPattern.matcher(block);
+        if (matcher.find()) {
+            try {
+                category = Category.valueOf(matcher.group(1).trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid Category: " + matcher.group(1));
+            }
+        }
+
         matcher = creationDatePattern.matcher(block);
         if (matcher.find()) {
             creationDate = LocalDate.parse(matcher.group(1), DATE_FORMATTER);
         }
 
-        // Basic validation
         if (id != -1 && title != null && description != null && dueDate != null &&
-                priority != null && status != null && creationDate != null) {
-            return new Task(id, title, description, dueDate, priority, status, creationDate);
+                priority != null && status != null && category != null && creationDate != null) {
+            return TaskCreator.createTask(id, title, description, dueDate, priority, status, category, creationDate);
         } else {
             System.err.println("Could not fully parse task block:\n" + block);
             return null;
@@ -138,19 +141,19 @@ public class FileHandler {
     }
 
 
-    // if append is false, it will overwrite the file. if append is true, it will append to the file
-    public static void writeTasksToFile(Task task,boolean append) {
+    public static void writeTasksToFile(Set<Task> tasks) {
         Path filePath = Paths.get(TASKS_FILE_PATH);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile(), append))) { // <-- HERE
-            writer.write("task"); // Prefix each task with "task"
-            writer.newLine();
-            writer.write(task.toString()); // Uses Task's overridden toString()
-            writer.newLine(); // Add a new line after each task
-            writer.newLine(); // Add an empty line between tasks for separation
-            System.out.println("Tasks appended successfully to: " + TASKS_FILE_PATH);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+            for (Task task : tasks) {
+                writer.write("task");
+                writer.newLine();
+                writer.write(task.toString()); // Uses Task's toString()
+                writer.newLine(); // Newline after task block
+                writer.newLine(); // Empty line between tasks
+            }
+            System.out.println("Tasks written successfully to: " + TASKS_FILE_PATH);
         } catch (IOException e) {
             System.err.println("Error writing tasks to file: " + e.getMessage());
         }
     }
-
 }

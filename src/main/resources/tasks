@@ -1,11 +1,12 @@
 task
-ID:1
-Title:Pyrwi Task
-Description:Mnogo golqm task
-Due Date:2021-02-20
-Priority:HIGH
+ID:3
+Title:Treti Task
+Description:Posleden task
+Due Date:2023-07-01
+Priority:LOW
 Status:PENDING
-Creation Date:2020-01-01
+Category:WORK
+Creation Date:2022-05-20
 
 task
 ID:2
@@ -14,41 +15,26 @@ Description:Po-maluk task
 Due Date:2022-03-15
 Priority:MEDIUM
 Status:COMPLETED
+Category:PERSONAL
 Creation Date:2021-01-10
 
 task
-ID:3
-Title:Treti Task
-Description:Posleden task
-Due Date:2023-07-01
-Priority:LOW
-Status:PENDING
-Creation Date:2022-05-20
-
-task
-ID:1
-Title:Pyrwi Task
-Description:Mnogo golqm task
-Due Date:2021-02-20
-Priority:HIGH
-Status:PENDING
-Creation Date:2020-01-01
-
-task
-ID:2
-Title:Vtori Task
-Description:Po-maluk task
-Due Date:2022-03-15
+ID:4
+Title:chetwyrti task
+Description:mnogo hubaw task
+Due Date:2025-07-14
 Priority:MEDIUM
 Status:COMPLETED
-Creation Date:2021-01-10
+Category:WORK
+Creation Date:2025-06-12
 
 task
-ID:3
-Title:Treti Task
-Description:Posleden task
-Due Date:2023-07-01
+ID:5
+Title:peti task
+Description:idealen task
+Due Date:2025-08-15
 Priority:LOW
-Status:PENDING
-Creation Date:2022-05-20
+Status:COMPLETED
+Category:PERSONAL
+Creation Date:2025-06-12
 

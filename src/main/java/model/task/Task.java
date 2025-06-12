@@ -1,27 +1,29 @@
-package model;
+package model.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Task implements Comparable<Task> {
+public abstract class Task implements Comparable<Task> {
     private Long id;
     private String title;
     private String description;
     private LocalDate dueDate;
     private Priority priority;
     private Status status;
+    private Category category;
     private LocalDate creationDate;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // Constructor
-    public Task(long id, String title, String description, LocalDate dueDate, Priority priority, Status status, LocalDate creationDate) {
+    public Task(long id, String title, String description, LocalDate dueDate, Priority priority, Status status, Category category, LocalDate creationDate) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
         this.status = status;
+        this.category = category;
         this.creationDate = creationDate;
     }
 
@@ -58,6 +60,10 @@ public class Task implements Comparable<Task> {
         this.status = status;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
     @Override
     public String toString() {
         return "ID:" + id + "\n" +
@@ -66,6 +72,7 @@ public class Task implements Comparable<Task> {
                 "Due Date:" + dueDate.format(DATE_FORMATTER) + "\n" +
                 "Priority:" + priority.getPriorityName() + "\n" +
                 "Status:" + status.getStatusName() + "\n" +
+                "Category:" + category.name() + "\n" +
                 "Creation Date:" + creationDate.format(DATE_FORMATTER);
     }
 

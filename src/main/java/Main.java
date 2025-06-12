@@ -24,9 +24,9 @@ public class Main {
             TaskManagerImpl taskManager = new TaskManagerImpl();
 
             User user1 = new Employee("ivan", "123", taskManager);
-            User user2 = new Administrator("Pesho", "1234", taskManager);
-            User user3 = new Employee("Georgi", "12345", taskManager);
-            User user4 = new Administrator("Martin", "123456", taskManager);
+            User user2 = new Administrator("pesho", "1234", taskManager);
+            User user3 = new Employee("georgi", "12345", taskManager);
+            User user4 = new Administrator("martin", "123456", taskManager);
             users.add(user1);
             users.add(user2);
             users.add(user3);

@@ -16,4 +16,13 @@ public class Employee extends User {
             System.out.println("you have no permission to complete this work task with Id ->" + completedTask.getId() + "<- and title ->" + completedTask.getTitle()+ "<-");
         }
     }
+    @Override
+    public void deleteTask(Long deletedTaskId) {
+        Task deletedTask = getTaskManager().getTaskById(deletedTaskId);
+        if(deletedTask instanceof PersonalTask) {
+            getTaskManager().deleteTask(deletedTaskId);
+        }else if(deletedTask instanceof WorkTask) {
+            System.out.println("you have no permission to delete this work task with Id ->" + deletedTask.getId() + "<- and title ->" + deletedTask.getTitle()+ "<-");
+        }
+    }
 }

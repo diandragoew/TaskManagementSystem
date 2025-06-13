@@ -2,6 +2,7 @@ package model.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public abstract class Task implements Comparable<Task> {
     private Long id;
@@ -79,5 +80,18 @@ public abstract class Task implements Comparable<Task> {
     @Override
     public int compareTo(Task task) {
         return this.title.compareTo(task.title);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(title, task.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title);
     }
 }

@@ -4,10 +4,7 @@ import model.task.*; // Ensure all necessary Task-related imports are here
 import util.FileHandler;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TaskManagerImpl implements TaskManager {
@@ -162,5 +159,9 @@ public class TaskManagerImpl implements TaskManager {
                 .filter(task -> task.getId() == id)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Set<Task> getTasks() {
+        return Collections.unmodifiableSet(tasks);
     }
 }

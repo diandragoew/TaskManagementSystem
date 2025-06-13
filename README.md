@@ -15,10 +15,6 @@ This project implements a simple console-based Task Management System in Java. I
 -   [Usage](#usage)
 -   [User Credentials](#user-credentials)
 -   [Running Tests](#running-tests)
--   [File Structure](#file-structure)
--   [Contributing](#contributing)
--   [License](#license)
--   [Contact](#contact)
 
 ## Features
 

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Main {
-    static Set<User> users = new TreeSet<>();
+    private static Set<User> users = new TreeSet<>();
     private static User loggedInUser = null;
 
     public static void main(String[] args) {

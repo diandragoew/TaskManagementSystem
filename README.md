@@ -28,8 +28,8 @@ This project implements a simple console-based Task Management System in Java. I
     -   Display all tasks currently in the system.
     -   Display a specific set of tasks (e.g., search results).
 -   **Task Search:** Search tasks by title and/or description (case-insensitive).
--   **Task Completion:** Mark existing tasks as `COMPLETED` using their ID.
--   **Task Deletion:** Remove tasks from the system using their ID.
+-   **Task Completion:** Mark existing tasks as `COMPLETED` using their ID. (Tasks with category "WORK" can be marked as `COMPLETED` only by users who are administrators.)
+-   **Task Deletion:** Remove tasks from the system using their ID. (Tasks with category "WORK" can be deleted only by users who are administrators.)
 -   **Data Persistence:** All task operations (create, complete, delete) are saved to a file (`src/main/resources/tasks`) using a `FileHandler`.
 -   **Unique Task IDs:** Automatically generates a unique ID for each new task.
 

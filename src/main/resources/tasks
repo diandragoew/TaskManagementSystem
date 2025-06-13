@@ -1,0 +1,30 @@
+task
+ID:3
+Title:make a button
+Description:amazing task
+Due Date:2025-08-15
+Priority:LOW
+Status:PENDING
+Category:PERSONAL
+Creation Date:2025-06-12
+
+task
+ID:2
+Title:orange label
+Description:bigger task
+Due Date:2023-07-01
+Priority:LOW
+Status:PENDING
+Category:WORK
+Creation Date:2022-05-20
+
+task
+ID:1
+Title:red page
+Description:smaller task
+Due Date:2022-03-15
+Priority:MEDIUM
+Status:COMPLETED
+Category:PERSONAL
+Creation Date:2021-01-10
+
